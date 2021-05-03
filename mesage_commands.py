@@ -567,11 +567,7 @@ async def primary_command(message, player_name):
 
 
 async def link_command(message, player_name):
-    if not is_valid_rsn(player_name):
-        await message.channel.send(player_name + " isn't a valid Runescape user name.")
-        return
 
-    owner_id = 0
     code = id_generator()
     discord_id = message.author.id
 
@@ -616,32 +612,30 @@ async def link_command(message, player_name):
                   + "+ Player is: Verified." + "\n" \
                   + "```"
 
-    msgUnverified = "```diff" + "\n" \
-                    + f"+ Player: {player_name} \n" \
-                    + "====== Verification Information ======\n" \
-                    + "- Player is: Unverified." + "\n" \
-                    + f"- Please use the !link {player_name} command to claim ownership." + "\n" \
-                    + "```"
+    if not is_valid_rsn(player_name):
+        await message.channel.send(player_name + " isn't a valid Runescape user name.")
+        return
 
-    player_id, exists = sql.verificationPull(player_name)
-    if exists:
-        check, verified, owner_list = sql.verification_check(player_id)
-        if verified:
-            msg = msgVerified
-        else:
-            if check:
-                if int(discord_id) not in owner_list:
-                    sql.verificationInsert(discord_id, player_id, code)
-                    msg = msgPassed
-                else:
-                    msg = msgInUse
-            else:
-                sql.verificationInsert(discord_id, player_id, code)
-                msg = msgPassed
-    else:
-        msg = msgInstallPlugin
+    verifyID = await get_playerid_verification(playerName=player_name, token=token)
+    verifyID = verifyID['id']
 
-    await message.author.send(msg)
+    if verifyID==0:
+        await message.channel.send(msgInstallPlugin)
+        return
+
+    verifyStatus = await get_player_verification_full_status(playerName=player_name, token=token)
+    verified = verifyStatus['Verified_status']
+
+    if verified == 1:
+        owner_verified_info = await get_verified_player_info(playerName=player_name, token=token)
+        ownerID = owner_verified_info['Discord_id']
+        if ownerID == discord_id:
+            message.channel.send(msgVerified)
+            return
+
+    
+    
+    await message.channel.send(msgPassed)
 
 
 async def verify_comand(message, player_name, token):
@@ -656,7 +650,7 @@ async def verify_comand(message, player_name, token):
                   + "```"
 
     msgUnverified = "```diff" + "\n" \
-                    + "+ Player: " + str(player_name) + "\n" \
+                    + f"+ Player: {player_name} \n" \
                     + "====== Verification Information ======\n" \
                     + "- Player is: Unverified." + "\n" \
                     + f"- Please use the !link {player_name} command to claim ownership." + "\n" \
@@ -736,7 +730,29 @@ async def runAnalysis(regionTrueName, region_id):
 
 async def get_player_verification_full_status(playerName, token):
 
-    url = f'https://www.osrsbotdetector.com/dev/discord/player_rsn_discord_account_status/{token}/{playerName}'
+    url = f'https://www.osrsbotdetector.com/dev/discord/verify/player_rsn_discord_account_status/{token}/{playerName}'
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as r:
+            if r.status == 200:
+                verify = await r.json()
+
+    return verify[0]
+
+async def get_playerid_verification(playerName, token):
+
+    url = f'https://www.osrsbotdetector.com/discord/verify/playerid/{token}/{playerName}'
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as r:
+            if r.status == 200:
+                verify = await r.json()
+
+    return verify[0]
+
+async def get_verified_player_info(playerName, token):
+
+    url = f'https://www.osrsbotdetector.com/discord/verify/verified_player_info/{token}/{playerName}'
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as r:
