@@ -577,20 +577,19 @@ async def link_command(message, player_name):
 
     msgPassed = "```diff" + "\n" \
                 + "====== STATUS ======\n" \
-                + "Request to link RSN: " + str(player_name) + "\n" \
-                + "Your discord ID is: " + str(discord_id) + "\n" \
-                + "Access Code: " + str(code) + "\n" \
+                + f"Request to link RSN: {player_name} \n" \
+                + f"Your discord ID is: {discord_id} \n" \
+                + f"Access Code: {code} \n" \
                 + "====== SETUP ======\n" \
                 + "+ Please read through these instructions." + "\n" \
                 + "+ 1. Open Old School Runescape through RuneLite." + "\n" \
-                + "+ 2. Login as: '" + str(player_name) + "'." + "\n" \
+                + f"+ 2. Login as: '{player_name}' \n" \
                 + "+ 3. Join the clan channel: 'Ferrariic'." + "\n" \
                 + "+ 4. Verify that a Plugin Admin or Plugin Moderator is present in the channel." + "\n" \
                 + "+ 5. If a Plugin Admin or Plugin Moderator is not available, please leave a message in #bot-commands." + "\n" \
-                + "+ 6. Type into the Clan Chat: '!Code " + str(code) + "'." + "\n" \
-                + "+ 7. Type '!verify " + str(
-        player_name) + "' in #bot-commands channel to confirm that you have been Verified." + "\n" \
-                + "+ 9. Verification Process Complete." + "\n" \
+                + f"+ 6. Type into the Clan Chat: '!Code {code}.' \n" \
+                + f"+ 7. Type '!verify {player_name}' in #bot-commands channel to confirm that you have been Verified." + "\n" \
+                + "+ 8. Verification Process Complete." + "\n" \
                 + "====== INFO ======\n" \
                 + "+ You may link multiple Runescape accounts via this method." + "\n" \
                 + "+ If you change the name of your account(s) you must repeat this process with your new RSN(s)." + "\n" \
@@ -612,13 +611,13 @@ async def link_command(message, player_name):
                        + "```"
 
     msgVerified = "```diff" + "\n" \
-                  + "+ Player: " + str(player_name) + "\n" \
+                  + f"+ Player: {player_name} \n" \
                   + "====== Verification Information ======\n" \
                   + "+ Player is: Verified." + "\n" \
                   + "```"
 
     msgUnverified = "```diff" + "\n" \
-                    + "+ Player: " + str(player_name) + "\n" \
+                    + f"+ Player: {player_name} \n" \
                     + "====== Verification Information ======\n" \
                     + "- Player is: Unverified." + "\n" \
                     + f"- Please use the !link {player_name} command to claim ownership." + "\n" \
