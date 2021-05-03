@@ -501,71 +501,6 @@ async def submit_command(message, paste_url, recipient):
     await recipient.send(msg)
 
 
-async def primary_command(message, player_name):
-    discord_id = message.author.id
-
-    if not is_valid_rsn(player_name):
-        await message.channel.send(player_name + " isn't a valid Runescape user name.")
-        return
-
-    msgDoesNotExist = "```diff" + "\n" \
-                      + "- Player does not exist. Please verify that you have typed in the username correctly." + "\n" \
-                      + "```"
-    msgNotConnected = "```diff" + "\n" \
-                      + "- You are not connected to this player. You must verify your link to this player with !link <RSN>." + "\n" \
-                      + "```"
-    msgPendingVerification = "```diff" + "\n" \
-                             + "- You are pending verification on this player. Please verify this account with !link <RSN>" + "\n" \
-                             + "```"
-    msgPlayerUnverified = "```diff" + "\n" \
-                          + "- The account you are attempting to link is Unverified. Please !link <RSN> and verify this account." + "\n" \
-                          + "```"
-    msgNULLError = "```diff" + "\n" \
-                   + "- Primary values could not be reset to NULL. Please contact an Administrator." + "\n" \
-                   + "```"
-    msgPrimarySetError = "```diff" + "\n" \
-                         + "- Your player could not be assigned a Primary value. Please contact an Administrator." + "\n" \
-                         + "```"
-    msgConfirmedPrimary = "```diff" + "\n" \
-                          + "+ Player has been successfully updated as Primary." + "\n" \
-                          + "```"
-
-    player_id, exists = sql.verificationPull(player_name)
-    if exists:
-        check, verified = sql.discord_verification_check(discord_id, player_id)
-        if check:
-            if verified:
-                data, verified_account = sql.VerifyRSNs(discord_id, player_id)
-                if verified_account:
-                    PrimaryNULL = sql.insertPrimaryNULL(discord_id)
-                    if PrimaryNULL:
-                        PrimaryTRUE = sql.insertPrimaryTRUE(discord_id, player_id)
-                        if PrimaryTRUE:
-                            print("Player has been successfully updated as Primary.")
-                            msg = msgConfirmedPrimary
-                        else:
-                            print("Your player could not be assigned a Primary value. Please contact an Administrator.")
-                            msg = msgPrimarySetError
-                    else:
-                        print("Primary values could not be reset to NULL. Please contact an Administrator.")
-                        msg = msgNULLError
-                else:
-                    print(
-                        "The account you are attempting to link is Unverified. Please !link <RSN> and verify this account.")
-                    msg = msgPlayerUnverified
-            else:
-                print("You are pending verification on this player. Please verify this account with !link <RSN>")
-                msg = msgPendingVerification
-        else:
-            print("You are not connected to this player. You must verify your link to this player with !link <RSN>.")
-            msg = msgNotConnected
-    else:
-        print("Player does not exist. Please verify that you have typed in the username correctly.")
-        msg = msgDoesNotExist
-
-    await message.author.send(msg)
-
-
 async def link_command(message, player_name):
 
     code = id_generator()
@@ -766,6 +701,8 @@ async def get_verified_player_info(playerName, token):
 async def post_discord_player_info(discord_id, player_id, code, token):
 
     url = f'https://www.osrsbotdetector.com/dev/discord/verify/insert_player_dpc/{token}/{discord_id}/{player_id}/{code}'
+
+    print(url)
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as r:
