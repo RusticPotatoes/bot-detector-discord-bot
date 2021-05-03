@@ -634,13 +634,11 @@ async def link_command(message, player_name):
             return
 
     try:
-        messagetxt = post_discord_player_info(discord_id=discord_id, player_id=verifyID, code=code, token=token)
+        messagetxt = await post_discord_player_info(discord_id=discord_id, player_id=verifyID, code=code, token=token)
         print(messagetxt)
+        await message.channel.send(msgPassed)
     except Exception as e:
         print(e)
-    
-    await message.channel.send(msgPassed)
-
 
 async def verify_comand(message, player_name, token):
     if not is_valid_rsn(player_name):
@@ -770,9 +768,5 @@ async def post_discord_player_info(discord_id, player_id, code, token):
     url = f'https://www.osrsbotdetector.com/dev/discord/verify/insert_player_dpc/{token}/{discord_id}/{player_id}/{code}'
 
     async with aiohttp.ClientSession() as session:
-        async with session.post(url) as r:
-            if r.status == 200:
-                postmsg = await r.json()
-
-    return postmsg
-    
+        async with session.get(url) as r:
+            return await r.json() if r.status == 200 else {"error":f"Failed: {r.status} error"}
