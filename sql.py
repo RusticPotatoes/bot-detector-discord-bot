@@ -138,26 +138,6 @@ def get_paste_label(paste_soup):
 
 # Verification sql statements
 
-def verificationPull(playerName):
-    mydb_players = mysql.connector.connect(**config_players)
-    mycursor = mydb_players.cursor(buffered=True)
-
-    player_id = 0
-    exists = False
-
-    sql = "SELECT * FROM Players WHERE name = %s"
-    mycursor.execute(sql,convert(playerName))
-    data = mycursor.fetchmany(size=1)
-    if len(data)>0:
-        exists = True
-        player_id = data[0][0]
-    else:
-        exists = False
-
-    mycursor.close()
-    mydb_players.close()
-    return player_id, exists
-
 def verification_check(player_id):
     mydb = mysql.connector.connect(**config_submissions)
     mycursor = mydb.cursor(buffered=True)

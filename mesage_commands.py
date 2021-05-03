@@ -633,7 +633,11 @@ async def link_command(message, player_name):
             message.channel.send(msgVerified)
             return
 
-    
+    try:
+        messagetxt = post_discord_player_info(discord_id=discord_id, player_id=verifyID, code=code, token=token)
+        print(messagetxt)
+    except Exception as e:
+        print(e)
     
     await message.channel.send(msgPassed)
 
@@ -735,40 +739,40 @@ async def get_player_verification_full_status(playerName, token):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as r:
             if r.status == 200:
-                verify = await r.json()
+                data = await r.json()
 
-    return verify[0]
+    return data[0]
 
 async def get_playerid_verification(playerName, token):
 
-    url = f'https://www.osrsbotdetector.com/discord/verify/playerid/{token}/{playerName}'
+    url = f'https://www.osrsbotdetector.com/dev/discord/verify/playerid/{token}/{playerName}'
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as r:
             if r.status == 200:
-                verify = await r.json()
+                playerIDverif = await r.json()
 
-    return verify[0]
+    return playerIDverif[0]
 
 async def get_verified_player_info(playerName, token):
 
-    url = f'https://www.osrsbotdetector.com/discord/verify/verified_player_info/{token}/{playerName}'
+    url = f'https://www.osrsbotdetector.com/dev/discord/verify/verified_player_info/{token}/{playerName}'
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as r:
             if r.status == 200:
-                verify = await r.json()
+                vplayerinfo = await r.json()
 
-    return verify[0]
+    return vplayerinfo[0]
 
-async def get_verified_player_info(discord_id, player_id, code, token):
+async def post_discord_player_info(discord_id, player_id, code, token):
 
-    url = f'https://www.osrsbotdetector.com/discord/verify/insert_player_dpc/{token}/{discord_id}/{player_id}/{code}'
+    url = f'https://www.osrsbotdetector.com/dev/discord/verify/insert_player_dpc/{token}/{discord_id}/{player_id}/{code}'
 
     async with aiohttp.ClientSession() as session:
         async with session.post(url) as r:
             if r.status == 200:
-                verify = await r.json()
+                postmsg = await r.json()
 
-    return verify[0]
+    return postmsg
     
