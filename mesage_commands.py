@@ -137,7 +137,6 @@ async def hiscores_lookup(ctx, rsn):
 
 
     except Exception as e:
-        print(e)
         await ctx.channel.send("Something went terribly wrong. :(")
 
     await intro_msg.delete()
@@ -287,8 +286,6 @@ async def predict_command(message, params):
 
                 
                 for predict in secondaries:
-                    print("poop")
-                    print(predict)
                     msg += str(plus_minus(predict[0], 'Real_Player')) + " " + str(predict[0]) + ": " \
                         + str(predict[1])
                     msg += "\n"
@@ -518,7 +515,7 @@ async def link_command(message, player_name):
                 + "+ 3. Join the clan channel: 'Ferrariic'." + "\n" \
                 + "+ 4. Verify that a Plugin Admin or Plugin Moderator is present in the channel." + "\n" \
                 + "+ 5. If a Plugin Admin or Plugin Moderator is not available, please leave a message in #bot-commands." + "\n" \
-                + f"+ 6. Type into the Clan Chat: '!Code {code}.' \n" \
+                + f"+ 6. Type into the Clan Chat: '!Code {code}' \n" \
                 + f"+ 7. Type '!verify {player_name}' in #bot-commands channel to confirm that you have been Verified." + "\n" \
                 + "+ 8. Verification Process Complete." + "\n" \
                 + "====== INFO ======\n" \
@@ -552,28 +549,30 @@ async def link_command(message, player_name):
         return
 
     verifyID = await get_playerid_verification(playerName=player_name, token=token)
-    verifyID = verifyID['id']
 
-    if verifyID==0:
+    if verifyID == None:
         await message.channel.send(msgInstallPlugin)
         return
 
     verifyStatus = await get_player_verification_full_status(playerName=player_name, token=token)
-    verified = verifyStatus['Verified_status']
+    if verifyStatus == None:
+        return
+    else:
+        
+        isVerified = verifyStatus['Verified_status']
 
-    if verified == 1:
-        owner_verified_info = await get_verified_player_info(playerName=player_name, token=token)
-        ownerID = owner_verified_info['Discord_id']
-        if ownerID == discord_id:
-            message.channel.send(msgVerified)
-            return
+        if isVerified == 1:
+            owner_verified_info = await get_verified_player_info(playerName=player_name, token=token)
+            ownerID = owner_verified_info['Discord_id']
+            if ownerID == discord_id:
+                message.channel.send(msgVerified)
+                return
 
     try:
         messagetxt = await post_discord_player_info(discord_id=discord_id, player_id=verifyID, code=code, token=token)
-        print(messagetxt)
         await message.channel.send(msgPassed)
     except Exception as e:
-        print(e)
+        pass
 
 async def verify_comand(message, player_name, token):
     if not is_valid_rsn(player_name):
@@ -665,31 +664,41 @@ async def runAnalysis(regionTrueName, region_id):
 
     return True
 
+
+
+BASE_URL = 'https://www.osrsbotdetector.com/dev/'
+
 async def get_player_verification_full_status(playerName, token):
 
-    url = f'https://www.osrsbotdetector.com/dev/discord/verify/player_rsn_discord_account_status/{token}/{playerName}'
+    url = f'{BASE_URL}discord/verify/player_rsn_discord_account_status/{token}/name'
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as r:
             if r.status == 200:
                 data = await r.json()
 
-    return data[0]
+    try:
+        return data[0]
+    except:
+        return None
 
 async def get_playerid_verification(playerName, token):
 
-    url = f'https://www.osrsbotdetector.com/dev/discord/verify/playerid/{token}/{playerName}'
+    url = f'{BASE_URL}discord/verify/playerid/{token}/{playerName}'
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as r:
             if r.status == 200:
                 playerIDverif = await r.json()
 
-    return playerIDverif[0]
+    try:
+        return playerIDverif[0]
+    except:
+        return None
 
 async def get_verified_player_info(playerName, token):
 
-    url = f'https://www.osrsbotdetector.com/dev/discord/verify/verified_player_info/{token}/{playerName}'
+    url = f'{BASE_URL}discord/verify/verified_player_info/{token}/{playerName}'
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as r:
@@ -700,10 +709,10 @@ async def get_verified_player_info(playerName, token):
 
 async def post_discord_player_info(discord_id, player_id, code, token):
 
-    url = f'https://www.osrsbotdetector.com/dev/discord/verify/insert_player_dpc/{token}/{discord_id}/{player_id}/{code}'
+    id = player_id['id']
 
-    print(url)
+    url = f'{BASE_URL}discord/verify/insert_player_dpc/{token}/{discord_id}/{id}/{code}'
 
     async with aiohttp.ClientSession() as session:
-        async with session.get(url) as r:
+        async with session.post(url) as r:
             return await r.json() if r.status == 200 else {"error":f"Failed: {r.status} error"}
