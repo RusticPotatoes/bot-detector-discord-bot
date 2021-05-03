@@ -760,3 +760,15 @@ async def get_verified_player_info(playerName, token):
                 verify = await r.json()
 
     return verify[0]
+
+async def get_verified_player_info(discord_id, player_id, code, token):
+
+    url = f'https://www.osrsbotdetector.com/discord/verify/insert_player_dpc/{token}/{discord_id}/{player_id}/{code}'
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url) as r:
+            if r.status == 200:
+                verify = await r.json()
+
+    return verify[0]
+    
