@@ -100,6 +100,7 @@ bot.load_extension('cogs.msg_commands.MapCommands')
 bot.load_extension('cogs.msg_commands.ModCommands')
 bot.load_extension('cogs.msg_commands.RSNLinkCommands')
 bot.load_extension('cogs.msg_commands.PlayerStatsCommands')
+bot.load_extension('cogs.msg_commands.TaskCommands')
 bot.load_extension('cogs.msg_commands.ProjectStatsCommands')
 bot.load_extension('cogs.msg_commands.BotSubmissionsCommands')
 
