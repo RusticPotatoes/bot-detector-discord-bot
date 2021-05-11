@@ -60,16 +60,17 @@ class TaskCommands(Cog, name='RSN Link Commands'):
                     return
 
         task_list = await task_processing.get_slayer_labels(token)
-        slayer_choice = random.randint(0, len(task_list))
-
+        slayer_choice = random.randint(0, len(task_list)-1)
         slayerTaskID = task_list[slayer_choice]['id']
         slayerTaskLabel = task_list[slayer_choice]['label']
-
         task_length = random.randint(5, 20)
 
-        slayer_locations = await task_processing.get_slayer_locations(token,label_name=slayerTaskLabel)
+        print(verifyStatus)
 
+        slayer_locations = await task_processing.get_slayer_locations(token,label_name=slayerTaskLabel)
         mbed = await slayer_task_msg(joinedName, task_length, slayerTaskLabel, slayer_locations)
+
+
         await ctx.channel.send(embed=mbed)
 
 
@@ -90,16 +91,53 @@ async def installplugin_msg():
     return mbed
 
 async def slayer_task_msg(joinedName, task_length, slayerTaskLabel, slayer_locations):
-    mbed = discord.Embed(title=f"Slayer Task for {joinedName}:", color=0x00ff00)
-    mbed.add_field (name="Task:", value=f"Find {task_length} of {slayerTaskLabel}.", inline=False)
-    mbed.add_field (name="Locations:", value=f"Here are a list of common locations to find a {slayerTaskLabel}:" + "\n"
-        + slayer_locations[0]['region_name'] + "\n"
-        + slayer_locations[1]['region_name'] + "\n"
-        + slayer_locations[2]['region_name'] + "\n"
-        + slayer_locations[3]['region_name'] + "\n"
-        + slayer_locations[4]['region_name'], inline=False)
-    mbed.set_thumbnail(url="https://user-images.githubusercontent.com/5789682/117361316-e1f9e200-ae87-11eb-840b-3bad75e80ff6.png")
+    mbed = discord.Embed(description=f"Find {task_length} {slayerTaskLabel}.", color=0x00ff00)
+    mbed.set_author(name=f"[WORK IN PROGRESS DOES NOT ACTUALLY WORK] Slayer Master Ferrariic (Easy) - {joinedName}", icon_url='https://user-images.githubusercontent.com/5789682/117591275-c437b180-b101-11eb-907d-59056cf277e3.png')
+    mbed.add_field (name=f"Locations where you might find a {slayerTaskLabel}:", value=f"\n" 
+        + "1. " + slayer_locations[0]['region_name'] + "\n"
+        + "2. " + slayer_locations[1]['region_name'] + "\n"
+        + "3. " + slayer_locations[2]['region_name'] + "\n"
+        + "4. " + slayer_locations[3]['region_name'] + "\n"
+        + "5. " + slayer_locations[4]['region_name'] + "\n"
+        + "6. " + slayer_locations[5]['region_name'] + "\n"
+        + "7. " + slayer_locations[6]['region_name'] + "\n"
+        + "8. " + slayer_locations[7]['region_name'] + "\n"
+        + "9. " + slayer_locations[8]['region_name'] + "\n"
+        + "10. " + slayer_locations[9]['region_name'], inline=False)
+
+
+    url_image = await get_image_link(slayerTaskLabel)
+    mbed.set_image(url=url_image)
+
+
+    url_image = await get_image_link(slayerTaskLabel)
+    mbed.set_image(url=url_image)
+
     return mbed
+
+async def get_image_link(slayerTaskLabel):
+    image_dict = {
+        "Agility_bot"               : "https://user-images.githubusercontent.com/5789682/117589241-694c8d00-b0f6-11eb-987e-d3e4cc41e556.gif",
+        "Bot"                       : "https://user-images.githubusercontent.com/5789682/117589243-6b165080-b0f6-11eb-8952-037f6d828909.gif",
+        "Cooking_bot"               : "https://user-images.githubusercontent.com/5789682/117589244-6c477d80-b0f6-11eb-847e-bb59cd7d655b.gif",
+        "PVM_Melee_bot"             : "https://user-images.githubusercontent.com/5789682/117589245-6e114100-b0f6-11eb-9649-8f5b794113b1.gif",
+        "Magic_bot"                 : "https://user-images.githubusercontent.com/5789682/117589247-6f426e00-b0f6-11eb-9cc3-6fed6c6fe581.gif",
+        "Mining_bot"                : "https://user-images.githubusercontent.com/5789682/117589250-70739b00-b0f6-11eb-8a15-59251d8322a2.gif",
+        "Runecrafting_bot"          : "https://user-images.githubusercontent.com/5789682/117589251-72d5f500-b0f6-11eb-85f0-a31a3cada6b0.gif",
+        "Wintertodt_bot"            : "https://user-images.githubusercontent.com/5789682/117589254-749fb880-b0f6-11eb-9777-64057c1fd187.gif",
+        "Woodcutting_bot"           : "https://user-images.githubusercontent.com/5789682/117589255-75d0e580-b0f6-11eb-98c4-a6223ef9c41e.gif",
+        "PVM_Ranged_Magic_bot"      : "https://user-images.githubusercontent.com/5789682/117589259-78cbd600-b0f6-11eb-8804-0bf21d5dd6b3.gif",
+        "Herblore_bot"              : "https://user-images.githubusercontent.com/5789682/117591248-a36f5c00-b101-11eb-9519-fc359c2205db.gif",
+        "Crafting_bot"              : "https://user-images.githubusercontent.com/5789682/117591462-a159cd00-b102-11eb-95f8-d6b3657516f3.gif",
+        "Fishing_bot"               : "https://user-images.githubusercontent.com/5789682/117593332-5db69180-b109-11eb-8322-c17cbd61c383.gif",
+        "Fishing_Cooking_bot"       : "https://user-images.githubusercontent.com/5789682/117593332-5db69180-b109-11eb-8322-c17cbd61c383.gif" 
+    }
+    try:
+        url = image_dict[slayerTaskLabel]
+    except KeyError:
+        url = image_dict["Bot"]
+
+    return url
 
 def setup(bot):
     bot.add_cog(TaskCommands(bot))
